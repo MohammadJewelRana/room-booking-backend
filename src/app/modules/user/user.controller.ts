@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import { catchAsync } from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { UserServices } from './user.service';
+import config from '../../config';
 
 const createUser = catchAsync(async (req, res) => {
   const result = await UserServices.createUserIntoDB(req.body);
@@ -16,8 +17,7 @@ const createUser = catchAsync(async (req, res) => {
 
 const getAllUser = catchAsync(async (req, res) => {
   const result = await UserServices.getAllUserFromDB();
-  console.log(result);
-  
+  // console.log(result);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -29,8 +29,8 @@ const getAllUser = catchAsync(async (req, res) => {
 
 const getSingleUser = catchAsync(async (req, res) => {
   const { id } = req.params;
-  console.log(id);
-  
+  // console.log(id);
+
   const result = await UserServices.getSingleUserFromDB(id);
 
   sendResponse(res, {
@@ -66,10 +66,46 @@ const updateSingleUser = catchAsync(async (req, res) => {
   });
 });
 
+const loginUser = catchAsync(async (req, res) => {
+  const result = await UserServices.loginUserFromDB(req.body);
+
+  const { refreshToken, accessToken } = result;
+
+  res.cookie('refreshToken', refreshToken, {
+    secure: config.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: 'none', //frontend and backend different domain
+    maxAge: 1000 * 60 * 60 * 24 * 365, //cookie token set for 1 year
+  });
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User is logged in successfully',
+    data: { accessToken, refreshToken },
+  });
+});
+
+const refreshToken = catchAsync(async (req, res) => {
+  const { refreshToken } = req.cookies;
+  // console.log(refreshToken);
+
+  const result = await UserServices.refreshToken(refreshToken);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'access token retrieved successfully',
+    data: result,
+  });
+});
+
 export const UserControllers = {
   createUser,
   getAllUser,
   getSingleUser,
   deleteSingleUser,
   updateSingleUser,
+  loginUser,
+  refreshToken,
 };
