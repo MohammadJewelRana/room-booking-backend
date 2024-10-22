@@ -6,10 +6,9 @@ import { BookingRoutes } from '../modules/booking/booking.routes';
 const router = Router();
 
 const moduleRoutes = [
-    { path: '/user', route: UserRoutes },
-    { path: '/room', route: RoomRoutes },
-    { path: '/booking', route: BookingRoutes },
-
+  { path: '/user', route: UserRoutes },
+  { path: '/room', route: RoomRoutes },
+  { path: '/booking', route: BookingRoutes },
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

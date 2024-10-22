@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import bcrypt from 'bcrypt';
 
-import { Schema,  model } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import config from '../../config';
 import { TUser } from './user.interface';
-
 
 const userSchema = new Schema<TUser>(
   {
@@ -13,7 +12,11 @@ const userSchema = new Schema<TUser>(
     password: { type: String, required: true, select: false },
     // profileImage: { type: String ,default:null},
     role: { type: String, enum: ['admin', 'user'], default: 'user' },
-    status: { type: String, enum: ['in-progress', 'blocked'], default: 'in-progress' },
+    status: {
+      type: String,
+      enum: ['in-progress', 'blocked'],
+      default: 'in-progress',
+    },
     isDeleted: { type: Boolean, default: false },
   },
   {
@@ -25,7 +28,10 @@ const userSchema = new Schema<TUser>(
 userSchema.pre('save', async function (next) {
   const user = this;
   if (user.isModified('password')) {
-    user.password = await bcrypt.hash(user.password, Number(config.bcrypt_salt_round));
+    user.password = await bcrypt.hash(
+      user.password,
+      Number(config.bcrypt_salt_round),
+    );
   }
   next();
 });

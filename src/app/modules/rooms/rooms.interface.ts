@@ -1,8 +1,10 @@
 export type TRooms = {
-  title: string;
+  roomTitle: string;
   rent: string;
   facilities: string[];
-  picture: string;
+  images: string[];
+  bedCount:number;
+  memberCount:number;
   status: 'available' | 'unavailable';
   isDeleted: boolean;
 };

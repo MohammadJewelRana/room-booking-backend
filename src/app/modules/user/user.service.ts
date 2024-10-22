@@ -98,7 +98,6 @@ const updateSingleUserFromDB = async (
 };
 
 const loginUserFromDB = async (payload: Partial<TUser>) => {
- 
   if (!payload) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Please provide login data');
   }
@@ -117,9 +116,9 @@ const loginUserFromDB = async (payload: Partial<TUser>) => {
   }
 
   //check password is correct
-  const isPasswordMatched =await bcrypt.compare(
+  const isPasswordMatched = await bcrypt.compare(
     payload?.password as string,
-    isUserExists?.password
+    isUserExists?.password,
   );
   // console.log(isPasswordMatched);
   if (!isPasswordMatched) {

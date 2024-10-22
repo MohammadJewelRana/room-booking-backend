@@ -11,6 +11,10 @@ const bookingSchema = new Schema<TBooking>(
     userId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
     roomId: { type: Schema.Types.ObjectId, required: true, ref: 'Room' },
     dates: { type: dateSchema, required: true },
+    roomRent: { type: String, required: true,default:'0' },
+    roomCount: { type: String, required: true,default:'0' },
+    grandTotal: { type: Number, required: true,default:0 },
+
     status: {
       type: String,
       enum: ['running', 'pending', 'complete'],
