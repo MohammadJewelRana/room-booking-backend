@@ -15,7 +15,7 @@ export type TBooking = {
 
 
 
-  status: 'running' | 'pending' | 'complete';
+  status: 'approved' | 'pending' | 'cancel';
   isDeleted: boolean;
 };
  

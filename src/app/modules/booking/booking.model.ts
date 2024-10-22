@@ -17,7 +17,7 @@ const bookingSchema = new Schema<TBooking>(
 
     status: {
       type: String,
-      enum: ['running', 'pending', 'complete'],
+      enum: ['approved', 'pending', 'cancel'],
       default: 'pending',
     },
     isDeleted: { type: Boolean, default: false },

@@ -6,7 +6,8 @@ import { USER_ROLE } from '../user/user.constant';
 const router = Router();
 
 router.post('/create-booking',auth(USER_ROLE.user), BookingControllers.createBooking);
-router.get('/',auth(USER_ROLE.admin,USER_ROLE.user), BookingControllers.getAllBooking);
+router.get('/', BookingControllers.getAllBooking);
+router.get('/myBooking/:id',auth(USER_ROLE.user), BookingControllers.getMyBooking);
 router.get('/:id',auth(USER_ROLE.admin,USER_ROLE.user), BookingControllers.getSingleBooking);
 router.delete('/:id',auth(USER_ROLE.admin,USER_ROLE.user), BookingControllers.deleteSingleBooking);
 router.patch('/:id',auth(USER_ROLE.admin,USER_ROLE.user), BookingControllers.updateSingleBooking);

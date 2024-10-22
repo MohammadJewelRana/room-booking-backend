@@ -8,8 +8,11 @@ const createBookingIntoDB = async (payload: TBooking) => {
   if (!payload) {
     throw new AppError(httpStatus.BAD_REQUEST, 'No data found');
   }
+  
+  const { roomId, dates } = payload;
 
-  if (payload.dates.startDate >= payload.dates.endDate) {
+  // Validate dates
+  if (dates.startDate >= dates.endDate) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       'Start date must be before the end date.',
@@ -18,12 +21,12 @@ const createBookingIntoDB = async (payload: TBooking) => {
 
   // Check for existing bookings that overlap with the provided dates
   const conflictingBookings = await Booking.find({
-    roomId: payload.roomId,
+    roomId: roomId,
     isDeleted: false,
     $or: [
       {
-        'dates.startDate': { $lte: payload.dates.endDate },
-        'dates.endDate': { $gte: payload.dates.startDate },
+        'dates.startDate': { $lte: dates.endDate },
+        'dates.endDate': { $gte: dates.startDate },
       },
     ],
   });
@@ -35,6 +38,7 @@ const createBookingIntoDB = async (payload: TBooking) => {
     );
   }
 
+  // If no conflicts, create the new booking
   const result = await Booking.create(payload);
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create a Booking!!');
@@ -43,11 +47,59 @@ const createBookingIntoDB = async (payload: TBooking) => {
   return result;
 };
 
+
+// const createBookingIntoDB = async (payload: TBooking) => {
+//   if (!payload) {
+//     throw new AppError(httpStatus.BAD_REQUEST, 'No data found');
+//   }
+
+//   if (payload.dates.startDate >= payload.dates.endDate) {
+//     throw new AppError(
+//       httpStatus.BAD_REQUEST,
+//       'Start date must be before the end date.',
+//     );
+//   }
+
+//   // Check for existing bookings that overlap with the provided dates
+//   const conflictingBookings = await Booking.find({
+//     roomId: payload.roomId,
+//     isDeleted: false,
+//     $or: [
+//       {
+//         'dates.startDate': { $lte: payload.dates.endDate },
+//         'dates.endDate': { $gte: payload.dates.startDate },
+//       },
+//     ],
+//   });
+
+//   if (conflictingBookings.length > 0) {
+//     throw new AppError(
+//       httpStatus.CONFLICT,
+//       'Room is already booked for the selected dates.',
+//     );
+//   }
+
+//   const result = await Booking.create(payload);
+//   if (!result) {
+//     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create a Booking!!');
+//   }
+
+//   return result;
+// };
+
+
+
+
+
+
+
 //get all Booking
+
+
 const getAllBookingFromDB = async () => {
   const result = await Booking.find({ isDeleted: false })
     .populate('userId', '_id name email')
-    .populate('roomId', ' _id title rent facilities picture status');
+    .populate('roomId', ' _id roomTitle rent facilities images status');
   return result;
 };
 
@@ -58,7 +110,21 @@ const getSingleBookingFromDB = async (bookingId: string) => {
   }
   const result = await Booking.findOne({ _id: bookingId, isDeleted: false })
     .populate('userId', '_id name email')
-    .populate('roomId', ' _id title rent facilities picture status');
+    .populate('roomId', ' _id roomTitle rent facilities images status');
+
+  if (!result) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Booking not found');
+  }
+  return result;
+};
+
+const getMyBookingFromDB = async (userId: string) => {
+  if (!userId) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'please give user id');
+  }
+  const result = await Booking.find({ userId:userId, isDeleted: false })
+    .populate('userId', '_id name email')
+    .populate('roomId', ' _id roomTitle rent facilities images status');
 
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Booking not found');
@@ -129,4 +195,5 @@ export const BookingServices = {
   getSingleBookingFromDB,
   deleteSingleBookingFromDB,
   updateSingleUserFromDB,
+  getMyBookingFromDB,
 };
